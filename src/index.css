@@ -1,32 +1,189 @@
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Tvoji THEME TOKENS koje si već definisao */
+
+/* ========= THEME TOKENS ========= */
+
+/* Light (default) */
 :root {
   color-scheme: light;
-  --bg: #F7F8FA;
-  --surface: #FFFFFF;
-  --text: #0B0B0F;
-  --primary: #9a21be;
-  --accent: #63ee68;
-  --border: #E5E7EB;
+
+  /* Osnovne boje */
+  --bg:        #F7F8FA;   /* pozadina (off-white) */
+  --surface:   #FFFFFF;   /* površine/kartice */
+  --text:      #0B0B0F;   /* osnovni tekst */
+  --muted:     #475569;   /* sekundarni tekst (tamnije) */
+  --muted-soft:#57667b;   /* sekundarni, svetliji */
+
+  /* Akcenti */
+  --primary:   #9a21be;
+  --primary-h: #7d2b96;
+  --accent:    #63ee68;
+  --accent-h:  #52d95a;
+  --accent-text:  #2ed33c; 
+
+
+  /* Bordure / delitelji */
+  --border:      #E5E7EB;
+  --border-soft: #EEF0F3;
 }
 
+.text-accent {
+  color: var(--accent-text);
+}
+
+/* Dark (preko .dark klase na <html>) */
 .dark {
   color-scheme: dark;
-  --bg: #0B0B0F;
-  --surface: #12131A;
-  --text: #FFFFFF;
-  --primary: #890dae;
-  --accent: #63ee68;
-  --border: #2A2E3A;
+
+  --bg:        #0B0B0F;
+  --surface:   #12131A;
+  --text:      #FFFFFF;
+  --muted:     #A0A8B8;
+  --muted-soft:#a2abbf;
+
+  --primary:   #890dae;
+  --primary-h: #7d2b96;
+  --accent:    #63ee68;
+  --accent-h:  #6ad96f;
+
+  --border:      #2A2E3A;
+  --border-soft: #1F2330;
 }
 
-/* Osnovni reset i primena varijabli */
+.dark .text-accent {
+  color: var(--accent); /* u dark modu vraćamo na default accent */
+}
+
+/* ========= BASE RESET ========= */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 html, body, #root {
   min-height: 100vh;
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+#root > main {
+  flex: 1; /* gura footer na dno */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Ne diktiramo layout preko <main> — koristi Tailwind container/utilities po potrebi */
+
+/* Slike */
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* Linkovi: ne forsiramo boju; Tailwind klase će je zadati po komponentama */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: background-color .2s ease, color .2s ease;
+}
+a:hover { text-decoration: underline; }
+
+/* Naslovi — bazni stil (Tailwind obično preuzima tipografiju po komponentama) */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+h1 { font-size: clamp(2rem, 3.5vw, 3.5rem); }
+h2 { font-size: clamp(1.75rem, 2.6vw, 2.5rem); }
+h3 { font-size: clamp(1.35rem, 2vw, 1.75rem); }
+
+/* Važno: NE farbamo globalno p/li/label/small!
+   (To je ranije posvetljavalo ceo sajt. Komponente koriste text-text/text-muted Tailwind tokene.) */
+
+/* Forme / fokus */
+input, button, select, textarea {
+  font: inherit;
+  color: var(--text);
+}
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 70%, black);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* ========= OPTIONAL: BAZNE UTIL KLASE (neutralne) ========= */
+/* Ostavili smo samo generičke — bez specifičnih komponentnih klasa */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+/* CTA fallback ako negde baš nema Tailwind klasa */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0.75rem;
+  padding: .75rem 1.25rem;
+  border: 0;
+}
+.btn-primary:hover { background: var(--primary-h); }
+
+.btn-accent {
+  background: var(--accent);
+  color: #000;
+  border-radius: 0.75rem;
+  padding: .75rem 1.25rem;
+  border: 0;
+}
+.btn-accent:hover { background: var(--accent-h); }
+
+/* Selektovanje teksta */
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Scrollbar (light/dark) */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--bg); }
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+.dark *::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-color: var(--bg);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--primary) 25%, var(--border));
 }

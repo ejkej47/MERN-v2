@@ -1,4 +1,6 @@
 // src/components/Footer.jsx
+import React from 'react';
+
 import { Link } from "react-router-dom";
 import { BookOpen, Info, Home } from "lucide-react";
 

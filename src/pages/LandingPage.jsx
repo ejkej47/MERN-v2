@@ -3,10 +3,10 @@ import { supabase } from "../lib/supabaseClient"; // Novi import
 import { getStorageUrl } from "../utils/helpers"; // Helper za slike
 
 import HeroSection from "../components/Landing/HeroSection";
-import FeaturedCourseSection from "../components/Landing/FeaturedCourseSection";
+//import FeaturedCourseSection from "../components/Landing/FeaturedCourseSection";
 import BenefitsSection from "../components/Landing/BenefitsSection";
 import AboutPreviewSection from "../components/Landing/AboutPreviewSection";
-import FeedbackSection from "../components/Landing/FeedbackSection";
+//import FeedbackSection from "../components/Landing/FeedbackSection";
 import FaqSection from "../components/Landing/FaqSection";
 import CtaSection from "../components/Landing/CtaSection";
 
@@ -72,10 +72,10 @@ export default function LandingPage() {
     <div className="bg-background text-text min-h-screen">
       {/* Prosleđujemo sređene podatke tvojim postojećim komponentama */}
       <HeroSection course={course} />
-      <FeaturedCourseSection course={course} modules={modules} />
+      {/*<FeaturedCourseSection course={course} modules={modules} />*/}
       <BenefitsSection />
       <AboutPreviewSection />
-      <FeedbackSection />
+      {/*<FeedbackSection />*/}
       <FaqSection />
       <CtaSection />
     </div>
