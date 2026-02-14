@@ -10,16 +10,16 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Provera sesije pri pokretanju (menja tvoj fetchUser)
-    const checkUser = async () => {
+    // Provera trenutne sesije čim se aplikacija učita
+    const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
 
-    checkUser();
+    getSession();
 
-    // 2. Slušaj promene (Login, Logout, Password Change)
+    // Slušamo promene (login, logout, registracija)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -28,20 +28,35 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Funkcija za Login
   const login = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    navigate("/");
+    navigate("/my-courses");
   };
 
+  // Funkcija za Registraciju
+  const register = async (email, password) => {
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        // Ovo šalje korisnika na tvoj sajt nakon što klikne link u emailu
+        emailRedirectTo: window.location.origin,
+      }
+    });
+    if (error) throw error;
+  };
+
+  // Funkcija za Logout
   const logout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
