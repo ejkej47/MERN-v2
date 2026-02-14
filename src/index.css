@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tvoji THEME TOKENS koje si već definisao */
+:root {
+  color-scheme: light;
+  --bg: #F7F8FA;
+  --surface: #FFFFFF;
+  --text: #0B0B0F;
+  --primary: #9a21be;
+  --accent: #63ee68;
+  --border: #E5E7EB;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0B0B0F;
+  --surface: #12131A;
+  --text: #FFFFFF;
+  --primary: #890dae;
+  --accent: #63ee68;
+  --border: #2A2E3A;
+}
+
+/* Osnovni reset i primena varijabli */
+html, body, #root {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
