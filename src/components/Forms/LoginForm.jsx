@@ -1,55 +1,75 @@
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { toast } from "react-hot-toast";
+import { supabase } from "../../lib/supabaseClient";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
-export default function LoginForm({ redirectPath }) {
+export default function LoginForm({ redirectPath = "/my-courses" }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth(); // Koristimo funkciju iz našeg novog konteksta
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    setLoading(true);
     try {
-      await login(email, password);
-      toast.success("Uspešno ste se prijavili!");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast.success("Uspešno ste prijavljeni!");
+      const from = location.state?.from?.pathname || redirectPath;
+      navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err.message || "Greška pri prijavi");
+      toast.error(err.message || "Greška pri prijavi.");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+    if (error) toast.error("Greška pri Google prijavi.");
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm text-text">Email adresa</label>
-        <input
-          type="email"
-          className="w-full rounded border border-borderSoft bg-background p-2 text-text focus:border-accent outline-none"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm text-text">Lozinka</label>
-        <input
-          type="password"
-          className="w-full rounded border border-borderSoft bg-background p-2 text-text focus:border-accent outline-none"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+    <form onSubmit={handleLogin} className="space-y-4">
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        className="w-full rounded-lg border border-borderSoft bg-background px-4 py-2 text-text focus:border-accent outline-none"
+      />
+      <input
+        type="password"
+        placeholder="Lozinka"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="w-full rounded-lg border border-borderSoft bg-background px-4 py-2 text-text focus:border-accent outline-none"
+      />
       <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded bg-primary py-2 font-bold text-white transition hover:bg-primary-hover disabled:opacity-50"
+        disabled={loading}
+        className="w-full rounded bg-accent py-2 font-semibold text-black hover:bg-accent-hover transition"
       >
-        {isSubmitting ? "Prijava..." : "Prijavi se"}
+        {loading ? "Prijava..." : "Uloguj se"}
+      </button>
+
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-borderSoft py-2 text-text hover:bg-surface"
+      >
+        <img src="https://developers.google.com/identity/images/g-logo.png" className="h-5 w-5" alt="G" />
+        Prijavi se preko Google-a
       </button>
     </form>
   );

@@ -1,50 +1,100 @@
-import React from 'react';
+// src/App.jsx
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
 import { useAuth } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
-// Importuj stranice
+// Layout i QoL
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoadingSpinner from "./components/QoL/LoadingSpinner";
+import ScrollToTop from "./components/QoL/ScrollToTop";
+
+// Pages
 import LandingPage from "./pages/LandingPage";
-/* Komentarisano da ne pravi greške dok ne sredimo fajlove:
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CoursePage from "./pages/CoursePage";
 import AllCoursesPage from "./pages/AllCoursesPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-*/
-import ScrollToTop from "./components/QoL/ScrollToTop";
+import ModulePage from "./pages/ModulePage"; 
+import LessonPage from "./pages/LessonPage";
+import ProfilePage from "./pages/ProfilePage";
+import OnamaPage from "./pages/ONamaPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+
+// Components & Auth Helpers
+import MyCourses from "./components/Course/MyCourses";
+import ForgotPassword from "./components/Forms/ForgotPassword";
+{/*import LoginSuccess from "./components/Success/LoginSuccess";
+import GoogleSuccess from "./components/Success/GoogleSuccess";*/}
 
 function App() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
 
-  // Dok Supabase proverava sesiju
-  if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-background text-text">
-      Učitavanje...
-    </div>
-  );
+  // Dok se Supabase Auth inicijalizuje, prikazujemo spinner
+  if (loading) return <LoadingSpinner className="h-screen" />;
 
   return (
     <>
       <ScrollToTop />
-      <Routes>
+      {/* Key pomaže React-u da resetuje rute pri promeni auth stanja */}
+      <Routes key={user ? "auth" : "guest"}>
+        
+        {/* Auth Callback rute (van Layout-a) 
+        <Route path="/google-success" element={<GoogleSuccess />} />
+        <Route path="/login-success" element={<LoginSuccess />} />*/}
+
+        {/* Glavna aplikacija unutar Layout-a (Navbar, Footer...) */}
         <Route path="/" element={<Layout />}>
-          {/* Samo LandingPage je aktivan */}
-          <Route index element={<LandingPage />} />
           
-          {/* Ostale rute su pod komentarom
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
+          {/* JAVNE RUTE */}
+          <Route index element={<LandingPage />} />
+          <Route path="about" element={<OnamaPage />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="courses" element={<AllCoursesPage />} />
           <Route path="course/:slug" element={<CoursePage />} />
-          <Route path="profile" element={<ProtectedRoute><div className="p-10 text-white">Profil</div></ProtectedRoute>} />
-          */}
+          
+          {/* AUTH RUTE (Gost) */}
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
 
+          {/* RUTAMA ZA UČENJE (Pristup modulima i lekcijama) */}
+          {/* Putanja usklađena sa ModuleCard: /modules/:slug */}
+          <Route path="modules/:slug" element={<ModulePage />} />
+          
+          {/* Putanja usklađena sa LessonContent */}
+          <Route path="modules/:slug/lessons/:lessonId" element={
+            <ProtectedRoute>
+              <LessonPage />
+            </ProtectedRoute>
+          } />
+
+          {/* ZAŠTIĆENE KORISNIČKE RUTE */}
+          <Route path="profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="my-courses" element={
+            <ProtectedRoute>
+              <MyCourses />
+            </ProtectedRoute>
+          } />
+
+          {/* Redirekcija za nepostojeće rute */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-      <Toaster position="bottom-right" />
+      
+      {/* Obaveštenja za korisnika (Dark tema) */}
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{
+          className: 'dark:bg-surface dark:text-text border border-borderSoft',
+        }}
+      />
     </>
   );
 }

@@ -3,7 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MobileMenu from "./MobileMenu";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, User as UserIcon } from "lucide-react";
+import { getStorageUrl } from "../utils/helpers"; // 👈 Dodat helper za slike
 
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
@@ -12,20 +13,13 @@ export default function Navbar() {
   const triggerRef = useRef();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // ========== THEME ==========
+  // ========== THEME LOGIC ==========
   const getInitialTheme = () => {
     if (typeof localStorage !== "undefined") {
       const saved = localStorage.getItem("theme");
       if (saved === "light" || saved === "dark") return saved;
     }
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-      return "dark";
-    }
-    return "light";
+    return window?.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   };
 
   const [theme, setTheme] = useState(getInitialTheme);
@@ -39,26 +33,23 @@ export default function Navbar() {
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-  if (loading) return null;
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
-  // shrink efekat
+  // ========== SCROLL EFFECT ==========
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const linkBase =
-    "text-base text-muted hover:text-text transition-colors relative";
-  const activeLink =
-    "text-text underline decoration-accent decoration-2 underline-offset-4";
-  const btnBase =
-    "px-4 py-2 text-base rounded-xl transition duration-200 font-medium";
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
+  if (loading) return null;
+
+  const linkBase = "text-base text-muted hover:text-text transition-colors relative";
+  const activeLink = "text-text underline decoration-accent decoration-2 underline-offset-4";
+  const btnBase = "px-4 py-2 text-base rounded-xl transition duration-200 font-medium";
 
   return (
     <>
@@ -68,151 +59,103 @@ export default function Navbar() {
         }`}
       >
         <div className="container mx-auto relative flex items-center justify-between px-4">
-          {/* Leva zona */}
+          {/* Leva zona - Logo */}
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2">
-              <img
-                src="/favicon.png"
-                alt="Logo"
-                className="h-9 w-9 rounded-md"
-              />
+              <img src="/favicon.png" alt="Logo" className="h-9 w-9 rounded-md" />
             </Link>
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `${linkBase} ${isActive ? activeLink : ""}`
-              }
-            >
+            <NavLink to="/" className={({ isActive }) => `${linkBase} ${isActive ? activeLink : ""}`}>
               Početna
             </NavLink>
           </div>
 
-          {/* Srednja zona */}
+          {/* Srednja zona - Navigacija */}
           <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
-            <NavLink
-              to="/courses"
-              className={({ isActive }) =>
-                `${linkBase} ${isActive ? activeLink : ""}`
-              }
-            >
+            <NavLink to="/courses" className={({ isActive }) => `${linkBase} ${isActive ? activeLink : ""}`}>
               Kursevi
             </NavLink>
-
             {user && (
-              <NavLink
-                to="/my-courses"
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? activeLink : ""}`
-                }
-              >
+              <NavLink to="/my-courses" className={({ isActive }) => `${linkBase} ${isActive ? activeLink : ""}`}>
                 Moji kursevi
               </NavLink>
             )}
-
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `${linkBase} ${isActive ? activeLink : ""}`
-              }
-            >
+            <NavLink to="/about" className={({ isActive }) => `${linkBase} ${isActive ? activeLink : ""}`}>
               O nama
             </NavLink>
           </div>
 
-          {/* Desna zona */}
+          {/* Desna zona - User/Auth */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Theme toggle */}
             <button
-              type="button"
               onClick={toggleTheme}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-borderSoft text-text hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-borderSoft text-text hover:bg-background transition"
               aria-label="Promeni temu"
-              title={theme === "dark" ? "Svetla tema" : "Tamna tema"}
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
             {user ? (
               <>
-                <Link
-                  to="/profile"
-                  className="group flex items-center gap-2"
-                >
-                  {user.image ? (
+                <Link to="/profile" className="group relative">
+                  {/* Prikaz profilne slike iz baze */}
+                  {user.user_metadata?.avatar_url || user.image_url ? (
                     <img
-                      src={user.image}
+                      src={getStorageUrl(user.user_metadata?.avatar_url || user.image_url)}
                       alt="Avatar"
-                      className="h-9 w-9 rounded-full object-cover ring-2 ring-borderSoft"
+                      className="h-10 w-10 rounded-full object-cover ring-2 ring-accent/20 group-hover:ring-accent transition"
                     />
                   ) : (
-                    <div className="grid h-9 w-9 place-items-center rounded-full bg-surface ring-2 ring-borderSoft">
-                      <span className="text-sm text-muted">👤</span>
+                    <div className="grid h-10 w-10 place-items-center rounded-full bg-surface ring-2 ring-borderSoft group-hover:ring-accent transition">
+                      <UserIcon size={20} className="text-muted" />
                     </div>
                   )}
                 </Link>
 
                 <button
                   onClick={handleLogout}
-                  className={`${btnBase} border border-borderSoft bg-surface text-text hover:bg-background`}
+                  className="px-4 py-2 rounded-xl border border-borderSoft bg-surface text-text hover:bg-background transition text-sm font-medium"
                 >
                   Odjava
                 </button>
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate("/login")}
-                  className={`${btnBase} bg-primary text-white hover:bg-primary-hover`}
+                  className="px-5 py-2 rounded-xl bg-primary text-white hover:bg-primary-hover transition shadow-sm font-medium"
                 >
                   Prijava
                 </button>
                 <button
                   onClick={() => navigate("/register")}
-                  className={`${btnBase} bg-accent text-black hover:bg-accent-hover`}
+                  className="px-5 py-2 rounded-xl bg-accent text-black hover:bg-accent-hover transition shadow-sm font-medium"
                 >
                   Registracija
                 </button>
-              </>
+              </div>
             )}
           </div>
 
-          {/* Mobile: tema + hamburger */}
+          {/* Mobile UI */}
           <div className="flex items-center gap-2 md:hidden">
             <button
-              type="button"
               onClick={toggleTheme}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-borderSoft text-text hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label="Promeni temu"
-              title={theme === "dark" ? "Svetla tema" : "Tamna tema"}
+              className="h-10 w-10 flex items-center justify-center rounded-lg border border-borderSoft"
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-
             <button
               ref={triggerRef}
               onClick={() => setMenuOpen(!menuOpen)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-borderSoft text-text hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label="Otvori meni"
+              className="h-10 w-10 flex items-center justify-center rounded-lg border border-borderSoft"
             >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M4 7h16M4 12h16M4 17h16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M4 7h16M4 12h16M4 17h16" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Mobilni meni */}
         {menuOpen && (
           <MobileMenu
             user={user}
@@ -222,7 +165,6 @@ export default function Navbar() {
           />
         )}
       </nav>
-
       <div className="h-16 md:h-20" aria-hidden />
     </>
   );
