@@ -1,96 +1,95 @@
+// src/components/Module/ModuleLessons.jsx
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
-export default function ModuleLessons({
-  moduleSlug,
-  lessons = [],
-  purchased = false,
-  completedLessonIds = [],
-  onPickLesson,
+export default function ModuleLessons({ 
+  courseSlug, 
+  moduleSlug, 
+  lessons = [], 
+  purchased = false, 
+  onPickLesson 
 }) {
+  // Sortiranje prema lesson_order koloni iz baze
   const sorted = useMemo(() => {
-    return [...lessons].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    if (!lessons) return [];
+    return [...lessons].sort((a, b) => (a.lesson_order ?? 0) - (b.lesson_order ?? 0));
   }, [lessons]);
 
-  const total = sorted.length || 0;
-  const completed = Array.isArray(completedLessonIds) ? completedLessonIds.length : 0;
-  const percent = total ? Math.round((completed / total) * 100) : 0;
-
-  const lastKey = `lastLesson-module-${moduleSlug}`;
-  const lastLessonId = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    const raw = localStorage.getItem(lastKey);
-    return raw ? raw : null;
-  }, [moduleSlug]);
+  // Vizuelni debug u slučaju da nema lekcija (prazan niz)
+  if (!lessons || lessons.length === 0) {
+    return (
+      <div className="p-10 border-2 border-dashed border-borderSoft rounded-xl text-center">
+        <p className="text-muted">Nema lekcija u ovom modulu.</p>
+      </div>
+    );
+  }
 
   return (
     <section className="rounded-2xl border border-borderSoft bg-surface p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-text">Lekcije</h3>
-        {total > 0 && <div className="text-sm text-text/80">{completed}/{total} ({percent}%)</div>}
-      </div>
+      <ul className="divide-y divide-borderSoft">
+        {sorted.map((l, idx) => {
+          /**
+           * Logika pristupa:
+           * Dozvoljeno ako je modul kupljen ILI ako je lekcija besplatna (is_free: true)
+           */
+          const canAccess = purchased || l.is_free === true; 
+          
+          /**
+           * Generisanje putanje prema ruti iz App.jsx: 
+           * /course/:courseSlug/module/:moduleSlug/lesson/:lessonId
+           */
+          const lessonUrl = `/course/${courseSlug}/module/${moduleSlug}/lesson/${l.slug}`;
 
-      <div className="mb-6">
-        <div className="h-2 w-full overflow-hidden rounded-full bg-background">
-          <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${percent}%` }} />
-        </div>
-        {lastLessonId && (
-          <div className="mt-3">
-            <Link
-              to={`/lesson/${lastLessonId}`}
-              className="inline-flex items-center gap-2 rounded-lg border border-borderSoft bg-background px-3 py-2 text-sm text-text hover:bg-surface"
-            >
-              ➤ Nastavi od poslednje lekcije
-            </Link>
-          </div>
-        )}
-      </div>
+          // Određivanje ikonice na osnovu content_type iz baze
+          let icon = "▶️";
+          if (l.content_type === "quiz") icon = "📝";
+          if (l.content_type === "exercise") icon = "🧩";
 
-      {!total ? (
-        <p className="text-muted">Nema lekcija u ovom modulu.</p>
-      ) : (
-        <ul className="divide-y divide-borderSoft">
-          {sorted.map((l, idx) => {
-            const locked = !!l.isLocked && !purchased;
-            // Promenjena putanja na /lesson/id
-            const to = locked ? "#" : `/lesson/${l.id}`;
-            const isLast = lastLessonId === String(l.id);
-
-            let icon = "▶️";
-            if (l.type === "quiz") icon = "📝";
-            else if (l.type === "exercise") icon = "🧩";
-
-            return (
-              <li key={l.id} className="flex items-center justify-between py-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background text-xs text-text/80">{idx + 1}</span>
+          return (
+            <li key={l.id} className={`flex items-center justify-between py-4 transition-opacity ${!canAccess ? "opacity-40" : ""}`}>
+              <div className="flex items-center gap-4 min-w-0">
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
+                  canAccess ? "bg-background text-accent border-borderSoft" : "bg-surface text-muted border-borderSoft"
+                }`}>
+                  {idx + 1}
+                </span>
+                
+                <div className="flex flex-col min-w-0">
                   <Link
-                    to={to}
+                    to={canAccess ? lessonUrl : "#"}
                     onClick={(e) => {
-                      if (locked) {
+                      if (!canAccess) {
                         e.preventDefault();
-                        toast.error("Lekcija je zaključana.");
+                        toast.error("Ova lekcija je zaključana. Potrebna je kupovina.");
                       } else {
-                        localStorage.setItem(lastKey, String(l.id));
                         onPickLesson?.(l);
                       }
                     }}
-                    className={`min-w-0 truncate text-sm md:text-base transition ${locked ? "cursor-not-allowed text-muted" : "text-text hover:text-accent"}`}
+                    className={`truncate font-medium transition-colors ${
+                      !canAccess ? "text-muted cursor-not-allowed" : "text-text hover:text-accent"
+                    }`}
                   >
                     {l.title}
-                    {isLast && !locked && <span className="ml-2 text-xs text-accent">(poslednja)</span>}
                   </Link>
+                  {l.is_free && !purchased && (
+                    <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Besplatno</span>
+                  )}
                 </div>
-                <div className="ml-3 flex shrink-0 items-center gap-2">
-                  <span className="text-lg">{icon}</span>
-                  {locked ? <span className="text-xs">🔒</span> : <span className="text-accent">✓</span>}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+              </div>
+
+              <div className="flex items-center gap-3 ml-4">
+                <span className="text-lg opacity-80">{icon}</span>
+                {!canAccess ? (
+                  <span className="text-muted text-sm">🔒</span>
+                ) : (
+                  <span className="text-accent text-sm font-bold">Gledaj →</span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

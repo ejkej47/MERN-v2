@@ -59,12 +59,11 @@ function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
 
-          {/* RUTAMA ZA UČENJE (Pristup modulima i lekcijama) */}
-          {/* Putanja usklađena sa ModuleCard: /modules/:slug */}
-          <Route path="modules/:slug" element={<ModulePage />} />
-          
-          {/* Putanja usklađena sa LessonContent */}
-          <Route path="modules/:slug/lessons/:lessonId" element={
+          {/* Nova, bolja ruta: */}
+          <Route path="course/:courseSlug/module/:moduleSlug" element={<ModulePage />} />
+
+          {/* I za lekcije prilagodi da prati istu logiku: */}
+          <Route path="course/:courseSlug/module/:moduleSlug/lesson/:lessonSlug" element={
             <ProtectedRoute>
               <LessonPage />
             </ProtectedRoute>

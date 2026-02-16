@@ -1,44 +1,40 @@
 // src/components/Module/ModuleTabs.jsx
 import React from "react";
 
-/**
- * Props:
- * - tabs: Array<{ id: string; label: string; count?: number }>
- * - active: string
- * - onChange: (id: string) => void
- * - sticky?: boolean          // default true (dodaje sticky bg bar)
- */
-export default function ModuleTabs({ tabs = [], active, onChange, sticky = true }) {
+export default function ModuleTabs({ tabs = [], active, onChange }) {
   return (
-    <div
-      className={
-        sticky
-          ? "sticky top-0 z-30 -mx-4 border-b border-borderSoft bg-background/90 px-4 backdrop-blur"
-          : ""
-      }
-    >
-      <nav className="mx-auto flex max-w-6xl gap-2 overflow-x-auto py-3" role="tablist" aria-label="Sekcije modula">
+    <div className="border-b border-borderSoft mt-10 mb-8"> {/* Dodata gornja margina mt-10 */}
+      <nav className="flex gap-10 overflow-x-auto no-scrollbar" role="tablist">
         {tabs.map((t) => {
           const isActive = t.id === active;
           return (
             <button
               key={t.id}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={`panel-${t.id}`}
               onClick={() => onChange?.(t.id)}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm transition
-                ${isActive
-                  ? "bg-accent text-black"
-                  : "bg-surface text-text hover:bg-background border border-borderSoft"
-                }`}
+              className={`relative pb-4 px-2 text-base font-semibold transition-all duration-300 rounded-t-lg ${
+                isActive 
+                  ? "text-accent bg-accent/5" // Suptilna pozadina za otvoren tab
+                  : "text-muted hover:text-text hover:bg-white/5"
+              }`}
             >
-              <span>{t.label}</span>
-              {typeof t.count === "number" && (
-                <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 text-xs
-                                  ${isActive ? "text-black/80" : "text-muted"}`}>
-                  {t.count}
-                </span>
+              <div className="flex items-center gap-2.5">
+                <span>{t.label}</span>
+                {typeof t.count === "number" && (
+                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-black ${
+                    isActive ? "bg-accent text-black" : "bg-surface text-muted"
+                  }`}>
+                    {t.count}
+                  </span>
+                )}
+              </div>
+              
+              {/* Moderni indikator sa jačim sjajem (glow) */}
+              {isActive && (
+                <>
+                  <div className="absolute bottom-0 left-0 h-[2px] w-full bg-accent shadow-[0_0_12px_rgba(130,231,134,0.8)]" />
+                  {/* Suptilna senka/sjaj unutar samog taba */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent pointer-events-none rounded-t-lg" />
+                </>
               )}
             </button>
           );
