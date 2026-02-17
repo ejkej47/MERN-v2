@@ -1,9 +1,9 @@
 // src/components/MobileMenu.jsx
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 
-export default function MobileMenu({ user, setMenuOpen, handleLogout, triggerRef }) {
+export default function MobileMenu({ user, profile, setMenuOpen, handleLogout, triggerRef }) {
   const navigate = useNavigate();
   const menuRef = useRef(null);
 
@@ -38,15 +38,33 @@ export default function MobileMenu({ user, setMenuOpen, handleLogout, triggerRef
         ref={menuRef}
         className="fixed inset-y-0 right-0 z-50 w-3/4 max-w-xs bg-surface border-l border-borderSoft shadow-xl p-6 flex flex-col"
       >
-        {/* 👤 Profil link (ikonica + tekst) */}
+{/* 👤 Profil link sa slikom */}
         {user && (
           <Link
             to="/profile"
             onClick={closeMenu}
-            className="flex items-center gap-3 mb-4 pb-4 border-b border-borderSoft hover:bg-background rounded-lg p-2 transition"
+            className="flex items-center gap-4 mb-6 pb-4 border-b border-borderSoft hover:bg-background rounded-xl p-2 transition-all"
           >
-            <User size={22} className="text-text" />
-            <span className="text-lg text-text">Profil</span>
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt="Profil"
+                referrerPolicy="no-referrer"
+                className="h-12 w-12 rounded-full object-cover border-2 border-accent/20"
+              />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+                <UserIcon size={24} className="text-accent" />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <span className="text-base font-bold text-text truncate max-w-[150px]">
+                {profile?.full_name || "Moj Profil"}
+              </span>
+              <span className="text-xs text-mutedSoft truncate max-w-[150px]">
+                {user.email}
+              </span>
+            </div>
           </Link>
         )}
 

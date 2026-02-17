@@ -7,7 +7,7 @@ import { Sun, Moon, User as UserIcon } from "lucide-react";
 import { getStorageUrl } from "../utils/helpers"; // 👈 Dodat helper za slike
 
 export default function Navbar() {
-  const { user, logout, loading } = useAuth();
+  const { user, profile, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef();
@@ -94,41 +94,47 @@ export default function Navbar() {
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
-            {user ? (
-              <>
-                <Link to="/profile" className="group relative">
-                  {/* Prikaz profilne slike iz baze */}
-                  {user.user_metadata?.avatar_url || user.image_url ? (
-                    <img
-                      src={getStorageUrl(user.user_metadata?.avatar_url || user.image_url)}
-                      alt="Avatar"
-                      className="h-10 w-10 rounded-full object-cover ring-2 ring-accent/20 group-hover:ring-accent transition"
-                    />
-                  ) : (
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-surface ring-2 ring-borderSoft group-hover:ring-accent transition">
-                      <UserIcon size={20} className="text-muted" />
-                    </div>
-                  )}
-                </Link>
+              {user ? (
+                <>
+                  <Link to="/profile" className="group relative">
+                    {/* Koristimo profile.avatar_url koji smo izvukli u AuthContext-u */}
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="Avatar"
+                        // OVO JE KLJUČNO: Google zahteva no-referrer da bi prikazao sliku
+                        //referrerPolicy="no-referrer"
+                        className="h-10 w-10 rounded-full object-cover group-hover:ring-accent transition"
+                        onError={(e) => {
+                          // Ako link ipak ne radi, sklanjamo sliku da se ne vidi "broken icon"
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="grid h-10 w-10 place-items-center rounded-full bg-surface ring-2 ring-borderSoft group-hover:ring-accent transition">
+                        <UserIcon size={20} className="text-muted" />
+                      </div>
+                    )}
+                  </Link>
 
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 rounded-xl border border-borderSoft bg-surface text-text hover:bg-background transition text-sm font-medium"
-                >
-                  Odjava
-                </button>
-              </>
-            ) : (
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-xl border border-borderSoft bg-surface text-text hover:bg-background transition text-sm font-medium"
+                  >
+                    Odjava
+                  </button>
+                </>
+              ) : (
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate("/login")}
-                  className="px-5 py-2 rounded-xl bg-primary text-white hover:bg-primary-hover transition shadow-sm font-medium"
+                  className="px-5 py-2 rounded-xl bg-accent text-black hover:bg-accent-hover transition shadow-sm font-medium"
                 >
                   Prijava
                 </button>
                 <button
                   onClick={() => navigate("/register")}
-                  className="px-5 py-2 rounded-xl bg-accent text-black hover:bg-accent-hover transition shadow-sm font-medium"
+                  className="px-5 py-2 rounded-xl bg-primary text-white hover:bg-primary-hover transition shadow-sm font-medium"
                 >
                   Registracija
                 </button>
@@ -159,6 +165,7 @@ export default function Navbar() {
         {menuOpen && (
           <MobileMenu
             user={user}
+            profile={profile}
             setMenuOpen={setMenuOpen}
             handleLogout={handleLogout}
             triggerRef={triggerRef}

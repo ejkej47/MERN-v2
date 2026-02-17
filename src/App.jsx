@@ -64,9 +64,9 @@ function App() {
 
           {/* I za lekcije prilagodi da prati istu logiku: */}
           <Route path="course/:courseSlug/module/:moduleSlug/lesson/:lessonSlug" element={
-            <ProtectedRoute>
+            //<ProtectedRoute>
               <LessonPage />
-            </ProtectedRoute>
+            //</ProtectedRoute>
           } />
 
           {/* ZAŠTIĆENE KORISNIČKE RUTE */}

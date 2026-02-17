@@ -136,8 +136,6 @@ export default function ModulePage() {
               )}
             </div>
 
-            <div className="h-px bg-borderSoft w-full" />
-
             {/* VEŽBE SEKCIJA */}
             <div>
               <div className="flex items-center gap-3 mb-6">

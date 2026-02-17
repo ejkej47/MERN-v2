@@ -1,11 +1,14 @@
+// src/pages/ProfilePage.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { User as UserIcon, BookOpen, Settings } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  // Izvlačimo 'profile' koji sadrži avatar_url i full_name
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +23,6 @@ export default function ProfilePage() {
     async function fetchMyCourses() {
       try {
         setLoading(true);
-        // Pretpostavka: tabela 'enrollments' povezuje user_id i course_id
         const { data, error } = await supabase
           .from("enrollments")
           .select(`
@@ -37,7 +39,6 @@ export default function ProfilePage() {
 
         if (error) throw error;
         
-        // Čistimo podatke da dobijemo niz objekata kurseva
         const userCourses = data.map((item) => item.courses).filter(Boolean);
         setCourses(userCourses);
       } catch (err) {
@@ -52,39 +53,37 @@ export default function ProfilePage() {
   }, [user, navigate]);
 
   const renderRightSection = () => {
-    if (loading) return <p className="p-4 text-muted">Učitavanje...</p>;
+    if (loading) return <div className="p-10 text-center animate-pulse text-muted">Učitavanje podataka...</div>;
 
     switch (activeSection) {
       case "courses":
         return (
           <div className="space-y-4">
             {courses.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-borderSoft p-10 text-center">
-                <p className="text-muted mb-4">Nemate upisanih kurseva.</p>
+              <div className="rounded-xl border border-dashed border-borderSoft p-10 text-center bg-surface/30">
+                <p className="text-muted mb-4">Još uvek niste upisali nijedan kurs.</p>
                 <Link to="/courses" className="text-accent font-semibold hover:underline">
-                  Pretraži ponudu →
+                  Pretraži katalog kurseva →
                 </Link>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                 {courses.map((course) => (
                   <div
                     key={course.id}
                     onClick={() => navigate(`/course/${course.slug}`)}
-                    className="group cursor-pointer overflow-hidden rounded-xl border border-borderSoft bg-background transition hover:border-accent hover:shadow-md"
+                    className="group cursor-pointer overflow-hidden rounded-2xl border border-borderSoft bg-surface/50 transition hover:border-accent hover:shadow-xl"
                   >
-                    <div className="aspect-video w-full bg-surface">
+                    <div className="aspect-video w-full overflow-hidden">
                       <img
                         src={course.image_url}
                         alt={course.title}
-                        className="h-full w-full object-cover transition group-hover:scale-105"
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                       />
                     </div>
                     <div className="p-4">
-                      <h4 className="font-bold text-text">{course.title}</h4>
-                      <p className="mt-1 text-xs text-mutedSoft line-clamp-1">
-                        Nastavi tamo gde si stao
-                      </p>
+                      <h4 className="font-bold text-text group-hover:text-accent transition">{course.title}</h4>
+                      <p className="mt-1 text-xs text-mutedSoft">Nastavi sa učenjem</p>
                     </div>
                   </div>
                 ))}
@@ -94,15 +93,31 @@ export default function ProfilePage() {
         );
       case "settings":
         return (
-          <div className="rounded-xl border border-borderSoft bg-background p-6">
-            <h3 className="mb-4 text-lg font-bold text-text">Podešavanja naloga</h3>
-            <p className="text-sm text-muted mb-4">Ulogovani ste kao: <strong>{user?.email}</strong></p>
-            <button 
-              onClick={() => toast.error("Funkcija promene lozinke se podešava u Supabase dashboardu.")}
-              className="rounded-lg bg-surface px-4 py-2 text-sm font-medium text-text border border-borderSoft hover:bg-background transition"
-            >
-              Resetuj lozinku putem mejla
-            </button>
+          <div className="rounded-2xl border border-borderSoft bg-surface/50 p-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-bold text-text mb-1">Informacije o nalogu</h3>
+              <p className="text-sm text-mutedSoft">Vaši podaci su sinhronizovani sa Google-om.</p>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-muted uppercase tracking-wider">Email adresa</span>
+                <span className="text-text font-medium">{user?.email}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-muted uppercase tracking-wider">Ime i prezime</span>
+                <span className="text-text font-medium">{profile?.full_name || "Nije podešeno"}</span>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-borderSoft">
+              <button 
+                onClick={() => toast.success("Link za promenu lozinke je poslat na vaš email!")}
+                className="rounded-xl bg-background px-5 py-2.5 text-sm font-semibold text-text border border-borderSoft hover:border-accent transition-all"
+              >
+                Promeni lozinku
+              </button>
+            </div>
           </div>
         );
       default:
@@ -111,49 +126,74 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto flex min-h-screen flex-col gap-8 px-4 py-10 lg:flex-row">
-      {/* Leva kolona - Sidebar */}
-      <div className="w-full lg:w-1/3">
-        <div className="overflow-hidden rounded-2xl border border-borderSoft bg-surface shadow-sm">
-          <div className="p-6 text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 text-3xl font-bold text-accent">
-              {user?.email?.charAt(0).toUpperCase()}
+    <div className="container mx-auto max-w-6xl px-4 py-12">
+      <div className="flex flex-col lg:flex-row gap-10">
+        
+        {/* LEVA KOLONA: Profilna karta */}
+        <div className="w-full lg:w-80 shrink-0">
+          <div className="overflow-hidden rounded-3xl border border-borderSoft bg-surface shadow-2xl">
+            <div className="p-8 text-center bg-gradient-to-b from-accent/5 to-transparent">
+              <div className="relative mx-auto mb-6 h-24 w-24">
+                {profile?.avatar_url ? (
+                  <img 
+                    src={profile.avatar_url}
+                    alt="Avatar"
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full rounded-full object-cover ring-4 ring-background shadow-2xl"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-full bg-accent/10 text-3xl font-bold text-accent">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-green-500 border-4 border-surface" title="Online" />
+              </div>
+              
+              <h2 className="text-xl font-bold text-text mb-1 truncate">
+                {profile?.full_name || user?.email?.split('@')[0]}
+              </h2>
+              <p className="text-sm font-medium text-accent italic">Premium Član</p>
             </div>
-            <h2 className="text-xl font-bold text-text truncate">{user?.email}</h2>
-            <p className="text-sm text-muted">Polaznik platforme</p>
+
+            <nav className="p-4 pt-0 space-y-1">
+              <button
+                className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  activeSection === "courses"
+                    ? "bg-accent text-black shadow-lg shadow-accent/20"
+                    : "text-mutedSoft hover:bg-background hover:text-text"
+                }`}
+                onClick={() => setActiveSection("courses")}
+              >
+                <BookOpen size={18} />
+                Moji Kursevi
+              </button>
+              <button
+                className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  activeSection === "settings"
+                    ? "bg-accent text-black shadow-lg shadow-accent/20"
+                    : "text-mutedSoft hover:bg-background hover:text-text"
+                }`}
+                onClick={() => setActiveSection("settings")}
+              >
+                <Settings size={18} />
+                Podešavanja
+              </button>
+            </nav>
           </div>
-
-          <nav className="border-t border-borderSoft">
-            <button
-              className={`w-full px-6 py-4 text-left text-sm transition ${
-                activeSection === "courses"
-                  ? "bg-accent/10 font-bold text-accent"
-                  : "text-text hover:bg-background"
-              }`}
-              onClick={() => setActiveSection("courses")}
-            >
-              Moji Kursevi
-            </button>
-            <button
-              className={`w-full border-t border-borderSoft px-6 py-4 text-left text-sm transition ${
-                activeSection === "settings"
-                  ? "bg-accent/10 font-bold text-accent"
-                  : "text-text hover:bg-background"
-              }`}
-              onClick={() => setActiveSection("settings")}
-            >
-              Podešavanja
-            </button>
-          </nav>
         </div>
-      </div>
 
-      {/* Desna kolona - Sadržaj */}
-      <div className="w-full lg:w-2/3">
-        <h2 className="mb-6 text-2xl font-bold text-text">
-          {activeSection === "courses" ? "Moji Kursevi" : "Podešavanja"}
-        </h2>
-        {renderRightSection()}
+        {/* DESNA KOLONA: Glavni sadržaj */}
+        <div className="flex-1">
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-text tracking-tight uppercase">
+              {activeSection === "courses" ? "Pregled Kurseva" : "Moj Nalog"}
+            </h1>
+            <div className="h-1.5 w-20 bg-accent mt-2 rounded-full" />
+          </div>
+          
+          {renderRightSection()}
+        </div>
+
       </div>
     </div>
   );

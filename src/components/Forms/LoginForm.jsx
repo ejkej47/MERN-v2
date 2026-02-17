@@ -34,6 +34,9 @@ export default function LoginForm({ redirectPath = "/my-courses" }) {
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
     });
     if (error) toast.error("Greška pri Google prijavi.");
   };
@@ -63,6 +66,13 @@ export default function LoginForm({ redirectPath = "/my-courses" }) {
         {loading ? "Prijava..." : "Uloguj se"}
       </button>
 
+      {/* Razdelnik */}
+      <div className="relative flex items-center py-2">
+        <div className="flex-grow border-t border-borderSoft"></div>
+        <span className="flex- Castro px-4 text-xs text-muted uppercase">Ili nastavi putem</span>
+        <div className="flex-grow border-t border-borderSoft"></div>
+      </div>
+      
       <button
         type="button"
         onClick={handleGoogleLogin}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient"; // Tvoj supabase klijent
+import { getStorageUrl } from "../utils/helpers";
+
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
@@ -30,7 +32,7 @@ export default function CoursesPage() {
         {courses.map((course) => (
           <Link key={course.id} to={`/course/${course.slug}`} className="group block overflow-hidden rounded-2xl border border-borderSoft bg-surface hover:border-accent transition">
             <div className="aspect-video bg-background">
-              <img src={course.image_url} alt={course.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-300" />
+              <img src={getStorageUrl(course.image_url)} alt={course.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-300" />
             </div>
             <div className="p-6">
               <h3 className="text-xl font-bold text-text">{course.title}</h3>

@@ -1,5 +1,6 @@
-import React from 'react'; // Obavezno za Vite
+import React from 'react';
 import { Link } from "react-router-dom";
+import { getStorageUrl } from "../../utils/helpers"; 
 
 export default function FeaturedCourseSection({ course, modules = [] }) {
   return (
@@ -17,15 +18,18 @@ export default function FeaturedCourseSection({ course, modules = [] }) {
         <div className="mt-10 grid md:grid-cols-3 gap-6">
           {modules && modules.length > 0 ? (
             modules.map((m) => (
-              <div
+              /* CELU KARTICU PRETVARAMO U LINK */
+              <Link
                 key={m.id}
+                to={`/course/${course?.slug}/module/${m.slug}`}
                 className="group flex flex-col rounded-xl border border-borderSoft bg-background overflow-hidden hover:border-accent transition shadow-lg"
               >
                 {/* Slika modula */}
                 <div className="aspect-[16/10] w-full bg-surface overflow-hidden">
                   {m.image_url ? (
                     <img
-                      src={m.image_url} // Koristimo polje direktno iz tvoje tabele
+                      /* KORISTIMO HELPER DA DOPUNIŠ PUTANJU IZ BUKETA */
+                      src={getStorageUrl(m.image_url)} 
                       alt={m.title}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
@@ -36,19 +40,18 @@ export default function FeaturedCourseSection({ course, modules = [] }) {
 
                 <div className="p-5 flex flex-col flex-1">
                   <div className="text-xs text-accent font-semibold">Modul {m.order}</div>
-                  <h3 className="mt-1 text-lg font-semibold text-text">{m.title}</h3>
+                  <h3 className="mt-1 text-lg font-semibold text-text  transition-colors">
+                    {m.title}
+                  </h3>
                   <p className="mt-2 text-mutedSoft line-clamp-3 text-sm">{m.description}</p>
                   
                   <div className="mt-auto pt-4">
-                    <Link
-                      to={`/course/${course?.slug}/module/${m.slug}`}
-                      className="text-accent hover:underline text-sm font-medium"
-                    >
+                    <span className="text-accent text-sm font-medium">
                       Saznaj više →
-                    </Link>
+                    </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p className="text-muted col-span-3 text-center py-10">Nema pronađenih modula za ovaj kurs.</p>

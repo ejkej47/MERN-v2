@@ -24,8 +24,6 @@ export default function LessonPage() {
     async function fetchLessonData() {
       try {
         setLoading(true);
-
-        // 1. Dohvatanje trenutne lekcije preko slug-a
         const { data: lessonData, error: lessonErr } = await supabase
           .from("lessons")
           .select("*, modules!inner(id, title, courses!inner(id))")
@@ -41,7 +39,6 @@ export default function LessonPage() {
         setLesson(lessonData);
         setModule(lessonData.modules);
 
-        // 2. Dohvatanje svih lekcija iz tog modula za sidebar
         const { data: allLessons } = await supabase
           .from("lessons")
           .select("*")
@@ -50,7 +47,6 @@ export default function LessonPage() {
 
         setLessons(allLessons || []);
 
-        // 3. Provera pristupa (isto kao u ModulePage da izbegnemo 406 grešku)
         if (user) {
           const { data: fullAccess } = await supabase
             .from("enrollments")
@@ -69,7 +65,6 @@ export default function LessonPage() {
               .eq("user_id", user.id)
               .eq("module_id", lessonData.module_id)
               .maybeSingle();
-
             if (moduleAccess) setIsPurchased(true);
           }
         }
@@ -80,11 +75,9 @@ export default function LessonPage() {
         setLoading(false);
       }
     }
-
     if (lessonSlug) fetchLessonData();
   }, [lessonSlug, user, courseSlug, moduleSlug, navigate]);
 
-  // Logika za navigaciju (Prethodna / Sledeća)
   const sortedLessons = useMemo(() => {
     return [...lessons].sort((a, b) => (a.lesson_order ?? 0) - (b.lesson_order ?? 0));
   }, [lessons]);
@@ -106,74 +99,28 @@ export default function LessonPage() {
 
   return (
     <div className="min-h-screen bg-background text-text">
-      <div className="mx-auto max-w-[1600px] px-4 py-6">
+      <div className="mx-auto max-w-[1600px] px-4 py-8">
         
-        {/* Breadcrumbs / Back button */}
-        <div className="mb-6">
+        {/* VEĆI I JASNIJI BREADCRUMB */}
+        <div className="mb-8">
           <Link 
             to={`/course/${courseSlug}/module/${moduleSlug}`}
-            className="text-accent hover:underline text-sm font-medium"
+            className="text-accent hover:text-accent-hover text-lg font-bold flex items-center gap-2 transition-colors"
           >
-            ← Nazad na modul: {module?.title}
+            <span className="text-2xl">←</span> Nazad na modul: {module?.title}
           </Link>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* LEVA STRANA: Video i Sadržaj */}
-          <div className="flex-1 space-y-6">
-            <h1 className="text-2xl md:text-3xl font-bold">{lesson.title}</h1>
-            
-            {/* Video Player Placeholder */}
-            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-borderSoft bg-surface shadow-2xl">
-              {lesson.content_type === "video" ? (
-                <div className="flex h-full items-center justify-center bg-black/20 text-muted italic">
-                  {/* Ovde će ići tvoj iframe ili video player na osnovu lesson.path */}
-                  Video plejer za: {lesson.title}
-                </div>
-              ) : (
-                <div className="flex h-full items-center justify-center text-accent">
-                  {lesson.content_type === "quiz" ? "📝 Kviz" : "🧩 Vežba"}
-                </div>
-              )}
-            </div>
-
-            {/* Navigacija lekcija */}
-            <div className="flex justify-between items-center bg-surface p-4 rounded-xl border border-borderSoft">
-              <button 
-                onClick={goPrev} 
-                disabled={currentIndex <= 0}
-                className="px-4 py-2 rounded-lg bg-background hover:bg-borderSoft disabled:opacity-30 transition font-medium"
-              >
-                ← Prethodna
-              </button>
-              <span className="text-sm text-muted">
-                Lekcija {currentIndex + 1} od {sortedLessons.length}
-              </span>
-              <button 
-                onClick={goNext} 
-                disabled={currentIndex >= sortedLessons.length - 1}
-                className="px-4 py-2 rounded-lg bg-accent text-black font-bold hover:opacity-90 disabled:opacity-30 transition"
-              >
-                Sledeća →
-              </button>
-            </div>
-
-            {/* Tekstualni sadržaj */}
-            <div className="bg-surface p-6 rounded-2xl border border-borderSoft">
-              <h3 className="text-xl font-bold mb-4">O ovoj lekciji</h3>
-              <div className="prose prose-invert max-w-none text-mutedSoft whitespace-pre-wrap">
-                {lesson.content || "Nema dodatnog opisa za ovu lekciju."}
+          {/* OBJEDINJENI SIDEBAR */}
+          <div className="w-full lg:w-80 shrink-0 sticky top-24 order-2 lg:order-1">
+            <div className="rounded-2xl border border-borderSoft bg-surface overflow-hidden shadow-sm">
+              <div className="p-5 border-b border-borderSoft bg-background/50">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <span>📚</span> Sadržaj modula
+                </h3>
               </div>
-            </div>
-          </div>
-
-          {/* DESNA STRANA: Sidebar sa lekcijama */}
-          <div className="w-full lg:w-80 shrink-0">
-            <div className="sticky top-24">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <span>📚</span> Sadržaj modula
-              </h3>
               <ModuleLessons 
                 courseSlug={courseSlug}
                 moduleSlug={moduleSlug}
@@ -181,6 +128,118 @@ export default function LessonPage() {
                 purchased={isPurchased}
                 onPickLesson={(l) => navigate(`/course/${courseSlug}/module/${moduleSlug}/lesson/${l.slug}`)}
               />
+            </div>
+          </div>
+
+          {/* GLAVNI SADRŽAJ */}
+          <div className="flex-1 space-y-6 order-1 lg:order-2 w-full">
+
+          {/* NAVIGACIJA SA FIKSNIM REDOSLEDOM NA DESKTOPU I BOLJIM NASLOVOM NA MOBILNOM */}
+          <div className="relative overflow-hidden bg-surface rounded-2xl border border-borderSoft shadow-sm">
+            
+            {/* PROGRES BAR - uvek na dnu kontejnera */}
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-background">
+              <div 
+                className="h-full bg-accent transition-all duration-700 ease-out shadow-[0_0_8px_rgba(var(--color-accent-rgb),0.5)]" 
+                style={{ width: `${((currentIndex + 1) / sortedLessons.length) * 100}%` }}
+              />
+            </div>
+
+            {/* Grid layout: 1 kolona na mobilnom, 3 kolone na desktopu */}
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1fr_200px] items-center p-5 pb-7 md:p-6 md:pb-7 gap-4">
+              
+              {/* 1. DUGME PRETHODNA - Na mobilnom ide u red sa Sledeća (vidi dole) */}
+              <div className="hidden md:block">
+                <button 
+                  onClick={goPrev} 
+                  disabled={currentIndex <= 0}
+                  className="w-full px-6 py-2.5 rounded-xl bg-background hover:bg-borderSoft disabled:opacity-30 transition font-bold border border-borderSoft text-sm"
+                >
+                  ← Prethodna
+                </button>
+              </div>
+              
+              {/* 2. NASLOV I BROJAČ - Centralna pozicija na oba uređaja */}
+              <div className="text-center min-w-0">
+                <h1 className="text-xl md:text-2xl font-black leading-tight text-text tracking-tight break-words">
+                  {lesson.title}
+                </h1>
+                <div className="mt-1.5 flex items-center justify-center gap-2 opacity-60">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-muted">
+                    Lekcija {currentIndex + 1} <span className="mx-1 text-muted/30">/</span> {sortedLessons.length}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3. DUGME SLEDEĆA - Vidljivo samo na desktopu u gridu */}
+              <div className="hidden md:block">
+                <button 
+                  onClick={goNext} 
+                  disabled={currentIndex >= sortedLessons.length - 1}
+                  className="w-full px-6 py-2.5 rounded-xl bg-accent text-black font-black hover:opacity-90 disabled:opacity-30 transition shadow-lg shadow-accent/20 text-sm"
+                >
+                  Sledeća →
+                </button>
+              </div>
+
+              {/* 4. MOBILNA DUGMAD - Prikazuju se jedno pored drugog samo na malim ekranima */}
+              <div className="flex md:hidden w-full gap-4 mt-2">
+                <button 
+                  onClick={goPrev} 
+                  disabled={currentIndex <= 0}
+                  className="flex-1 px-4 py-3 rounded-xl bg-background font-bold border border-borderSoft text-sm"
+                >
+                  ← Prethodna
+                </button>
+                <button 
+                  onClick={goNext} 
+                  disabled={currentIndex >= sortedLessons.length - 1}
+                  className="flex-1 px-4 py-3 rounded-xl bg-accent text-black font-bold shadow-lg shadow-accent/20 text-sm"
+                >
+                  Sledeća →
+                </button>
+              </div>
+
+            </div>
+          </div>
+{/* VIDEO PLAYER SEKCIJA */}
+<div className="aspect-video w-full overflow-hidden rounded-3xl border border-borderSoft bg-black shadow-2xl">
+  {lesson.content_type === "video" ? (
+    lesson.path ? (
+      <iframe
+        className="w-full h-full"
+        /* Parametri: 
+           rel=0 (bez tuđih videa na kraju)
+           modestbranding=1 (minimalan YT logo)
+           showinfo=0 (manje teksta preko videa) 
+        */
+        src={`https://www.youtube.com/embed/${lesson.path}?rel=0&modestbranding=1&iv_load_policy=3`}
+        title={lesson.title}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    ) : (
+      <div className="flex h-full items-center justify-center text-muted italic">
+        Video ID nije unet u bazu (kolona 'path').
+      </div>
+    )
+  ) : (
+    <div className="flex h-full items-center justify-center text-accent text-3xl font-black bg-accent/5">
+       {lesson.content_type === "quiz" ? "📝 Kviz" : "🧩 Vežba"}
+    </div>
+  )}
+</div>
+
+            {/* OPIS LEKCIJE */}
+            <div className="bg-surface p-8 rounded-3xl border border-borderSoft shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-10 w-1.5 bg-accent rounded-full" />
+                <h3 className="text-2xl font-black tracking-tight">O OVOJ LEKCIJI</h3>
+              </div>
+              <div className="prose prose-invert max-w-none text-mutedSoft whitespace-pre-wrap leading-relaxed text-lg">
+                {lesson.content || "Nema dodatnog opisa za ovu lekciju."}
+              </div>
             </div>
           </div>
 

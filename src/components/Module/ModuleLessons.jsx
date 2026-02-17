@@ -29,16 +29,9 @@ export default function ModuleLessons({
     <section className="rounded-2xl border border-borderSoft bg-surface p-5">
       <ul className="divide-y divide-borderSoft">
         {sorted.map((l, idx) => {
-          /**
-           * Logika pristupa:
-           * Dozvoljeno ako je modul kupljen ILI ako je lekcija besplatna (is_free: true)
-           */
+
           const canAccess = purchased || l.is_free === true; 
-          
-          /**
-           * Generisanje putanje prema ruti iz App.jsx: 
-           * /course/:courseSlug/module/:moduleSlug/lesson/:lessonId
-           */
+
           const lessonUrl = `/course/${courseSlug}/module/${moduleSlug}/lesson/${l.slug}`;
 
           // Određivanje ikonice na osnovu content_type iz baze
@@ -50,7 +43,7 @@ export default function ModuleLessons({
             <li key={l.id} className={`flex items-center justify-between py-4 transition-opacity ${!canAccess ? "opacity-40" : ""}`}>
               <div className="flex items-center gap-4 min-w-0">
                 <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
-                  canAccess ? "bg-background text-accent border-borderSoft" : "bg-surface text-muted border-borderSoft"
+                  canAccess ? "bg-background border-borderSoft" : "bg-surface text-muted border-borderSoft"
                 }`}>
                   {idx + 1}
                 </span>
@@ -72,9 +65,9 @@ export default function ModuleLessons({
                   >
                     {l.title}
                   </Link>
-                  {l.is_free && !purchased && (
+                  {/*{l.is_free && !purchased && (
                     <span className="text-[10px] uppercase tracking-widest text-accent font-bold">Besplatno</span>
-                  )}
+                  )}*/}
                 </div>
               </div>
 
@@ -83,7 +76,7 @@ export default function ModuleLessons({
                 {!canAccess ? (
                   <span className="text-muted text-sm">🔒</span>
                 ) : (
-                  <span className="text-accent text-sm font-bold">Gledaj →</span>
+                  <span className="text-accent text-sm font-bold"></span>
                 )}
               </div>
             </li>

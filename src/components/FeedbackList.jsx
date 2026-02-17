@@ -14,10 +14,19 @@ export default function FeedbackList({ showOnlyStats = false }) {
   useEffect(() => {
     async function fetchFeedbacks() {
       try {
-        // Povlačimo sve komentare iz site_feedback tabele
+        // 1. POVEZIVANJE SA PROFILES TABELOM
         const { data, error } = await supabase
           .from("site_feedback")
-          .select("*")
+          .select(`
+            id,
+            rating,
+            comment,
+            created_at,
+            profiles (
+              full_name,
+              avatar_url
+            )
+          `)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -25,7 +34,6 @@ export default function FeedbackList({ showOnlyStats = false }) {
         if (data) {
           setFeedbacks(data);
           
-          // Ručni obračun statistike
           const total = data.length;
           const sum = data.reduce((acc, curr) => acc + curr.rating, 0);
           const average = total > 0 ? (sum / total).toFixed(1) : 0;
@@ -40,7 +48,6 @@ export default function FeedbackList({ showOnlyStats = false }) {
     fetchFeedbacks();
   }, []);
 
-  // Ako treba samo prosečna ocena (npr. u headeru)
   if (showOnlyStats) {
     return (
       <div className="mt-4 flex items-center justify-center gap-2 text-accent">
@@ -58,7 +65,7 @@ export default function FeedbackList({ showOnlyStats = false }) {
       {/* Strelica levo */}
       <div className="swiper-button-prev-static">‹</div>
 
-      {/* Fade ivice za bolji vizuelni efekat */}
+      {/* Fade ivice */}
       <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-32 bg-gradient-to-r from-surface to-transparent hidden md:block"></div>
       <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-32 bg-gradient-to-l from-surface to-transparent hidden md:block"></div>
 
@@ -81,7 +88,7 @@ export default function FeedbackList({ showOnlyStats = false }) {
       >
         {feedbacks.map((fb) => (
           <SwiperSlide key={fb.id}>
-            <div className="rounded-xl border border-borderSoft bg-surface p-6 shadow-sm transition hover:shadow-md h-full flex flex-col">
+            <div className="rounded-xl border border-borderSoft bg-surface p-6 shadow-sm transition hover:shadow-md h-64 flex flex-col">
               {/* Ocena zvezdicama */}
               <div className="mb-4 flex items-center gap-1 text-accent">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -95,20 +102,31 @@ export default function FeedbackList({ showOnlyStats = false }) {
               </div>
 
               {/* Komentar */}
-              <p className="flex-1 text-sm italic text-text leading-relaxed">
-                "{fb.comment || "Sjajna platforma!"}"
+              <p className="flex-1 text-sm italic text-text leading-relaxed line-clamp-4">
+                {fb.comment && fb.comment.trim() !== "" ? `"${fb.comment}"` : ""}
               </p>
 
-              {/* Autor - email pošto ga imamo u bazi */}
+              {/* AUTOR - KORIŠĆENJE PROFILA IZ BAZE */}
               <div className="mt-6 flex items-center gap-3 border-t border-borderSoft pt-4">
-                <div className="grid h-8 w-8 place-items-center rounded-full bg-background border border-borderSoft">
-                  <span className="text-xs text-muted">👤</span>
-                </div>
+                {fb.profiles?.avatar_url ? (
+                  <img 
+                    src={fb.profiles.avatar_url}
+                    alt="Avatar"
+                    referrerPolicy="no-referrer" // BITNO ZA GOOGLE SLIKE
+                    className="h-9 w-9 rounded-full object-cover border border-borderSoft"
+                  />
+                ) : (
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-background border border-borderSoft text-[10px] font-bold text-accent">
+                    {fb.profiles?.full_name?.charAt(0) || "U"}
+                  </div>
+                )}
+                
                 <div className="flex flex-col min-w-0">
-                  <span className="truncate text-xs font-semibold text-text">Polaznik</span>
-                  {/* Prikazujemo email (sakriveno delimično radi privatnosti ako želiš) */}
-                  <span className="truncate text-[10px] text-muted">
-                    {fb.user_email || "Anonimno"}
+                  <span className="truncate text-sm font-bold text-text">
+                    {fb.profiles?.full_name || "Polaznik"}
+                  </span>
+                  <span className="truncate text-[10px] text-mutedSoft">
+                    Verifikovan polaznik
                   </span>
                 </div>
               </div>
