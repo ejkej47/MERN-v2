@@ -202,33 +202,45 @@ export default function LessonPage() {
 
             </div>
           </div>
-{/* VIDEO PLAYER SEKCIJA */}
-<div className="aspect-video w-full overflow-hidden rounded-3xl border border-borderSoft bg-black shadow-2xl">
-  {lesson.content_type === "video" ? (
-    lesson.path ? (
-      <iframe
-        className="w-full h-full"
-        /* Parametri: 
-           rel=0 (bez tuđih videa na kraju)
-           modestbranding=1 (minimalan YT logo)
-           showinfo=0 (manje teksta preko videa) 
-        */
-        src={`https://www.youtube.com/embed/${lesson.path}?rel=0&modestbranding=1&iv_load_policy=3`}
-        title={lesson.title}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+  {/* GRADIIJENTNI OKVIR SA MEDJUBOJOM (MAGENTA/PINK) */}
+  <div className="relative group p-[10px] rounded-[2rem]
+  bg-gradient-to-br
+  from-primary
+  via-[#3B82F6]/15 
+  to-accent 
+  shadow-2xl shadow-primary/20">
+    
+  {/* Unutrašnji kontejner koji drži video */}
+  <div className="aspect-video w-full overflow-hidden rounded-[1.85rem] bg-black relative z-10">
+    {lesson.content_type === "video" ? (
+      lesson.path ? (
+        <iframe
+          className="w-full h-full"
+          src={`https://www.youtube.com/embed/${lesson.path}?rel=0&modestbranding=1&iv_load_policy=3`}
+          title={lesson.title}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      ) : (
+        <div className="flex h-full items-center justify-center text-muted italic p-8 text-center">
+          Video ID nije unet u bazu (kolona 'path').
+        </div>
+      )
     ) : (
-      <div className="flex h-full items-center justify-center text-muted italic">
-        Video ID nije unet u bazu (kolona 'path').
+      <div className="flex h-full flex-col items-center justify-center bg-background/90 text-accent gap-4">
+        <div className="text-6xl animate-bounce">
+          {lesson.content_type === "quiz" ? "📝" : "🧩"}
+        </div>
+        <h2 className="text-2xl font-black uppercase tracking-widest text-text">
+          {lesson.content_type === "quiz" ? "Kviz" : "Vežba"}
+        </h2>
       </div>
-    )
-  ) : (
-    <div className="flex h-full items-center justify-center text-accent text-3xl font-black bg-accent/5">
-       {lesson.content_type === "quiz" ? "📝 Kviz" : "🧩 Vežba"}
-    </div>
-  )}
+    )}
+  </div>
+
+  {/* SJAJ (GLOW) KOJI PRATI GRADIJENT */}
+  <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary via-[#ff00ff] to-accent blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500 -z-10"></div>
 </div>
 
             {/* OPIS LEKCIJE */}
