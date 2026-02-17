@@ -11,18 +11,32 @@ const benefits = [
 
 export default function BenefitsSection() {
   return (
-    <section className="bg-surface py-16 border-t border-borderSoft">
-      <div className="container mx-auto max-w-7xl px-6 text-center">
-        <h2 className="text-3xl font-bold text-text">Zašto odabrati nas?</h2>
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    // "w-full" osigurava da sekcija zauzima 100% širine ekrana
+    <section className="w-full bg-surface py-20 border-t border-borderSoft">
+      
+      {/* Izbacili smo "container" i "max-w-7xl" da bi sadržaj išao od ivice do ivice */}
+      <div className="w-full px-4 md:px-10 text-center">
+        
+        <h2 className="text-3xl md:text-4xl font-black text-text tracking-tight">
+          Zašto odabrati <span className="text-accent">nas?</span>
+        </h2>
+
+        {/* Grid se sada širi koliko god je širok prozor browsera */}
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-4">
           {benefits.map((b, i) => (
             <div
               key={i}
-              className="p-6 rounded-xl bg-background border border-borderSoft hover:border-accent transition"
+              className="p-10 rounded-3xl bg-background border border-borderSoft hover:border-accent/50 transition-all duration-300 group flex flex-col items-center justify-center min-h-[280px]"
             >
-              <b.icon className="h-8 w-8 mx-auto text-accent" />
-              <h3 className="mt-4 text-lg font-semibold text-text">{b.title}</h3>
-              <p className="mt-2 text-sm text-mutedSoft">{b.desc}</p>
+              {/* Ikona sa blagim glow efektom na hover */}
+              <div className="p-4 rounded-2xl bg-accent/5 text-accent group-hover:scale-110 transition-transform duration-500">
+                <b.icon className="h-10 w-10" />
+              </div>
+              
+              <h3 className="mt-6 text-xl font-bold text-text">{b.title}</h3>
+              <p className="mt-3 text-sm text-mutedSoft leading-relaxed max-w-[250px]">
+                {b.desc}
+              </p>
             </div>
           ))}
         </div>

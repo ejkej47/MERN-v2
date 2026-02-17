@@ -39,14 +39,14 @@ export default function FeaturedCourseSection({ course, modules = [] }) {
                 </div>
 
                 <div className="p-5 flex flex-col flex-1">
-                  <div className="text-xs text-accent font-semibold">Modul {m.order}</div>
+                  <div className="text-xs text-primary font-semibold">Modul {m.order}</div>
                   <h3 className="mt-1 text-lg font-semibold text-text  transition-colors">
                     {m.title}
                   </h3>
                   <p className="mt-2 text-mutedSoft line-clamp-3 text-sm">{m.description}</p>
                   
                   <div className="mt-auto pt-4">
-                    <span className="text-accent text-sm font-medium">
+                    <span className="text-sm font-medium">
                       Saznaj više →
                     </span>
                   </div>

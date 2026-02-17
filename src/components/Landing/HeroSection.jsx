@@ -14,7 +14,7 @@ export default function HeroSection({ course }) {
             Emocionalna pismenost —{" "}
             <span className="font-extrabold text-accent">premium</span> online kursevi
           </h1>
-          <p className="mt-4 text-[clamp(14px,1.6vw,18px)] text-white/90">
+          <p className="mt-4 text-[clamp(14px,1.6vw,18px)] text-muted">
             Alati za bolje razumevanje i upravljanje emocijama u svakodnevnom životu. 
             Stručni, praktični i topli sadržaji koji pomažu kao „terapija online“.
           </p>

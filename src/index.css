@@ -20,11 +20,11 @@
   --muted-soft:#57667b;   /* sekundarni, svetliji */
 
   /* Akcenti */
-  --primary:   #9a21be;
-  --primary-h: #7d2b96;
-  --accent:    #63ee68;
-  --accent-h:  #52d95a;
-  --accent-text:  #2ed33c; 
+  --primary:   #ad1bdf;
+  --primary-h: #bf25f3;
+  --accent:    #60d665;
+  --accent-h:  #68ed6f;
+  --accent-text:  #2ed33c;  
 
 
   /* Bordure / delitelji */
@@ -50,6 +50,8 @@
   --primary-h: #7d2b96;
   --accent:    #63ee68;
   --accent-h:  #6ad96f;
+
+
 
   --border:      #2A2E3A;
   --border-soft: #1F2330;
