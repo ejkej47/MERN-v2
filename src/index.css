@@ -15,15 +15,15 @@
   /* Osnovne boje */
   --bg:        #F7F8FA;   /* pozadina (off-white) */
   --surface:   #FFFFFF;   /* površine/kartice */
-  --text:      #0B0B0F;   /* osnovni tekst */
+  --text:      #240850;   /* osnovni tekst */
   --muted:     #475569;   /* sekundarni tekst (tamnije) */
   --muted-soft:#57667b;   /* sekundarni, svetliji */
 
   /* Akcenti */
-  --primary:   #ad1bdf;
-  --primary-h: #bf25f3;
-  --accent:    #60d665;
-  --accent-h:  #68ed6f;
+  --primary:   #563984;
+  --primary-h: #563984;
+  --accent:    #B5DFAB;
+  --accent-h:  #B5DFAB;
   --accent-text:  #2ed33c;  
 
 
