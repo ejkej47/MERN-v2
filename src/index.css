@@ -13,8 +13,8 @@
   color-scheme: light;
 
   /* Osnovne boje */
-  --bg:        #F7F8FA;   /* pozadina (off-white) */
-  --surface:   #FFFFFF;   /* površine/kartice */
+  --bg:        #fcf6ed;   /* pozadina (off-white) */
+  --surface:   #f2f1d8;   /* površine/kartice */
   --text:      #240850;   /* osnovni tekst */
   --muted:     #475569;   /* sekundarni tekst (tamnije) */
   --muted-soft:#57667b;   /* sekundarni, svetliji */
