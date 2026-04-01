@@ -37,7 +37,7 @@ export default function HeroSection({ course }) {
         {/* Logo kao mockup */}
         <div className="flex-1 flex justify-center lg:justify-end relative z-10">
           <img
-            src="https://wslshkalwiruolpvsdgu.supabase.co/storage/v1/object/public/Course-assets/logo_tekst_transparent.png"
+            src="https://wslshkalwiruolpvsdgu.supabase.co/storage/v1/object/public/Course-assets/Ep_logo_novi.png"
             alt="Logo"
             //className="h-full w-full max-h-[420px] object-contain drop-shadow-xl"
           />
