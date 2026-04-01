@@ -65,10 +65,6 @@ export default function FeedbackList({ showOnlyStats = false }) {
       {/* Strelica levo */}
       <div className="swiper-button-prev-static">‹</div>
 
-      {/* Fade ivice */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-32 bg-gradient-to-r from-surface to-transparent hidden md:block"></div>
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-32 bg-gradient-to-l from-surface to-transparent hidden md:block"></div>
-
       <Swiper
         modules={[Navigation, Autoplay]}
         spaceBetween={20}
@@ -84,7 +80,7 @@ export default function FeedbackList({ showOnlyStats = false }) {
           640: { slidesPerView: 2 },
           0: { slidesPerView: 1 },
         }}
-        className="pb-12 flex-1"
+        className="flex-1"
       >
         {feedbacks.map((fb) => (
           <SwiperSlide key={fb.id}>

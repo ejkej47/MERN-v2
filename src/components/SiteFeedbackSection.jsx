@@ -16,7 +16,7 @@ export default function SiteFeedbackSection() {
   };
 
   return (
-    <section className="bg-surface border-t border-borderSoft px-4 py-16">
+    <section className="bg border-t border-borderSoft px-4 py-16">
       <div className="container mx-auto max-w-6xl">
         {/* Naslov + statistika */}
         <header className="mb-10 text-center">
