@@ -71,7 +71,7 @@ export default function LandingPage() {
 
   return (
     <div className="bg-background text-text min-h-screen">
-      <HeroSection course={course} />
+      <HeroSection course={course} modules = {modules}/>
       <FeaturedCourseSection course={course} modules={modules} />
       <BenefitsSection />
       <AboutPreviewSection />
