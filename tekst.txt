@@ -1,0 +1,114 @@
+Rezime projekta — MERN-v2 (React/Vite → Next.js migracija) [cite: 1]
+
+Stack (potvrđeno)
+Next.js 16.2.10 (App Router), React 19.2.7 [cite: 1]
+Supabase (@supabase/ssr 0.12.0, @supabase/supabase-js 2.110.0) — Auth, DB, RLS (Storage izbačen zarad privatnosti) [cite: 1]
+Zod 4.4.3 (validacija) [cite: 1]
+Tailwind CSS 3 (uspešno konfigurisan sa CSS varijablama za boje)
+react-icons (za UI ikonice)
+Naplata: Lemon Squeezy (kao Merchant of Record) [cite: 1]
+
+Šta je urađeno do sad
+Postavljeni package.json i jsconfig.json sa @/* alias-om. [cite: 1]
+Spremna Supabase baza i Auth sistem (klijentski i serverski klijenti, middleware zaštita ruta). [cite: 2]
+[ZAVRŠENO] Prikaz kurseva i pristup sadržaju: Rute rade kao čiste Server Komponente. [cite: 3] Sadržaj se prikazuje na osnovu is_free fleg-a ili provere tabela enrollments / user_module_access. [cite: 4]
+[ZAVRŠENO] Mock-ovanje naplate: Postavljena API ruta /api/webhooks/mock-payment koja koristi Service Role (Admin) ključ za siguran upis u transactions, enrollments i user_module_access. [cite: 5]
+[ZAVRŠENO] Klijentska navigacija i testiranje: Implementiran MockCheckoutButton i čist osnovni Layout sa Navbar-om. [cite: 6]
+[ZAVRŠENO] Dashboard i profil: Napravljene rute (dashboard)/my-courses (dinamički izlistava kupljeno) i (dashboard)/profile (forma sa Server Akcijom za izmenu podataka). [cite: 7]
+[ZAVRŠENO] RLS Optimizacija: Očišćene duple polise, omogućeno javno čitanje lessons tabele (kako bi kurikulum bio vidljiv, dok je sadržaj zaštićen u kodu). [cite: 8]
+
+Plan daljeg razvoja po fazama
+FAZA 1 — Naplata i integracija [ZAVRŠENO - POC] [cite: 9]
+✔️ Mock-ovanje webhook-a za lokalno testiranje uspešno integrisano. [cite: 9] Pripremljen teren za pravu Lemon Squeezy integraciju kasnije. [cite: 10]
+
+FAZA 2 — Praćenje napretka i profil korisnika [ZAVRŠENO] [cite: 10]
+✔️ Dinamička lista u (dashboard)/my-courses. [cite: 10]
+✔️ Izmena podataka u (dashboard)/profile. [cite: 11]
+✔️ UI i Server Akcija za "Označi kao završeno" logiku (user_lesson_progress). [cite: 11]
+✔️ Dinamički sistem za kvizove (JSONB arhitektura) sa Server Akcijom za čuvanje user_quiz_results. [cite: 12] Postavljen QuizEngine i dinamički blokovi za različite tipove zadataka (true_false, matrix_rating, open_text_list). [cite: 13]
+
+FAZA 3 — Sigurnost na nivou baze [ZAVRŠENO] [cite: 13]
+✔️ RLS polise proverene i optimizovane za sve ključne tabele. [cite: 14]
+✔️ Odbacuju se Storage polise za avatare radi maksimalne privatnosti i anonimnosti korisnika. [cite: 15] Prikazivaće se samo inicijal korisnika (prvo slovo imena) na klijentskoj strani. [cite: 16]
+
+FAZA 4 — Stilizacija [U TOKU] 
+✔️ Tailwind CSS inicijalizovan i konfigurisan.
+✔️ Postavljen globalni dizajn sa mekim paletama boja (psihoterapija tema) preko CSS varijabli.
+✔️ Ažurirani Layout, Navbar i Footer komponente.
+✔️ Implementiran Landing Page koji povlači module iz baze.
+✔️ Podešen `next.config.js` za preuzimanje slika sa Supabase Storage-a (Course-assets bucket).
+
+FAZA 5 — Produkcijski Auth
+Uključivanje email potvrde (SMTP Resend/Postmark) i stranice za zaboravljenu lozinku. [cite: 18]
+
+Struktura fajlova (C:\Users\User\Desktop\MERN-v2\src>) [cite: 19]
+├── middleware.js
+├── actions/
+│   ├── auth.js
+│   ├── profile.js
+│   ├── progress.js
+│   └── quiz.js
+├── app/
+│   ├── globals.css
+│   ├── layout.js
+│   ├── (auth)/
+│   │   ├── callback/route.js
+│   │   ├── forgot-password/page.js
+│   │   ├── login/page.js
+│   │   ├── register/page.js
+│   │   └── update-password/page.js
+│   ├── (course)/
+│   │   ├── course/
+│   │   │   └── [courseSlug]/
+│   │   │       ├── page.js
+│   │   │       └── module/
+│   │   │           └── [moduleSlug]/
+│   │   │               ├── page.js
+│   │   │               └── lesson/[lessonSlug]/page.js
+│   │   └── courses/page.js
+│   ├── (dashboard)/
+│   │   ├── my-courses/page.js
+│   │   └── profile/page.js
+│   ├── (marketing)/
+│   │   ├── page.js
+│   │   ├── about/
+│   │   └── privacy-policy/
+│   └── api/
+│       └── webhooks/
+│           └── mock-payment/route.js
+├── components/
+│   ├── course/
+│   │   └── MockCheckoutButton.js
+│   ├── layout/
+│   │   ├── Navbar.js
+│   │   └── Footer.js
+│   ├── quiz/
+│   │   ├── QuizEngine.js
+│   │   ├── TrueFalseBlock.js
+│   │   ├── MatrixRatingBlock.js
+│   │   ├── OpenTextListBlock.js
+│   │   └── OtherBlock.js
+│   └── ui/
+│       └── Avatar.js
+└── lib/
+    └── supabase/
+        ├── admin.js
+        ├── client.js
+        ├── middleware.js
+        └── server.js
+
+JSON Šema Baze Podataka (Izvod najbitnijih)
+courses (id, title, description, slug, image_url, price) [cite: 22]
+enrollments (id, user_id, course_id, module_id, enrolled_at) [cite: 22]
+lessons (id, module_id, course_id, title, path, lesson_order, is_free, content_type, content, slug) [cite: 22]
+modules (id, course_id, title, description, price, order, slug, image_url)
+profiles (id, full_name, email, payment_provider, payment_customer_id) [avatar_url se ignoriše/uklanja] [cite: 22]
+transactions (id, user_id, course_id, amount, currency, status, payment_provider, provider_transaction_id) [cite: 22]
+user_lesson_progress (user_id, lesson_id, is_completed, completed_at) [cite: 22]
+user_module_access (user_id, module_id) [cite: 22]
+user_quiz_results (id, user_id, quiz_key, flight, attack, manipulation, harmonious, quiz_type, results_data) [cite: 22]
+
+Ukoliko fali neka informacija: ne nagadjaj, vec pitaj da ti se posalju dodatni potrebni podaci. [cite: 22, 23]
+
+TRENUTNI ZADATAK:
+Faza 4 — Završetak povezivanja dinamičkih ruta za module i kurseve unutar kreiranog UI-a, kao i nastavak stilizacije ostalih stranica.
