@@ -3,7 +3,7 @@ import { FaInstagram, FaEnvelope } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--bg-soft)] text-[var(--text-main)] pt-16 pb-8 border-t border-[var(--accent-soft)]">
+    <footer className="bg-[var(--bg-accent-green)] text-[var(--text-main)] pt-16 pb-8 border-t border-[var(--accent-soft)]">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* 1. CTA Sekcija */}

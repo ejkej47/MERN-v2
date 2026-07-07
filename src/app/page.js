@@ -129,19 +129,19 @@ export default async function Home() {
             Iskustva klijenata
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-soft)]">
+            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-accent-green)]">
               <p className="text-[var(--text-main)] font-medium mb-6 leading-relaxed">
                 "Ovaj program mi je pomogao da napokon razumem svoje reakcije. Materijali su jasni i lako primenljivi u svakodnevici."
               </p>
               <p className="text-[var(--text-main)] font-bold">— Ana M.</p>
             </div>
-            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-soft)]">
+            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-accent-green)]">
               <p className="text-[var(--text-main)] font-medium mb-6 leading-relaxed">
                 "Struktura kurseva je odlična. Tačno te vodi korak po korak bez osećaja preplavljenosti informacijama."
               </p>
               <p className="text-[var(--text-main)] font-bold">— Marko S.</p>
             </div>
-            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-soft)]">
+            <div className="p-8 rounded-3xl border border-[var(--accent-soft)] bg-[var(--bg-accent-green)]">
               <p className="text-[var(--text-main)] font-medium mb-6 leading-relaxed">
                 "Topla preporuka za svakoga ko želi da radi na sebi na jedan strukturisan i profesionalan način."
               </p>

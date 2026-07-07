@@ -4,7 +4,7 @@
 
 :root {
   /* Osnova */
-  --bg-soft: #f7f2e8; /* Veoma blaga, topla bež za pozadinu sajta */
+  --bg-soft: #f5efe3; /* Veoma blaga, topla bež za pozadinu sajta */
   --accent-soft: #EBE6E0; /* Za hover efekte i nežne bordure */
   --text-main: #000000; /* Striktno crna za sav tekst */
   
@@ -14,7 +14,7 @@
   
   /* Sekundarna / Success boja (Zelena) */
   --success: #4A7C59; /* Tamnija, smirujuća zelena za progres/uspeh */
-  --bg-accent-green: #E8F0EA; /* Veoma svetla, pastelno zelena za pozadine kartica */
+  --bg-accent-green: #8ed182; /* Veoma svetla, pastelno zelena za pozadine kartica */
 }
 
 body {
