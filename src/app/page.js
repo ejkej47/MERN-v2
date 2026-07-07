@@ -26,7 +26,7 @@ export default async function Home() {
       {/* HERO SEKCIJA */}
       <section className="relative pt-16 pb-24 md:pt-32 md:pb-32 overflow-hidden min-h-[80vh] flex items-center">
         <Image 
-          src="/hero-slika-v2.jpg" 
+          src="/hero-slika-v3.jpg" 
           alt="Psihoterapija i rad na sebi"
           fill
           priority
@@ -38,7 +38,7 @@ export default async function Home() {
           {/* Tekst ima svoju bež pozadinu */}
           <div className="w-full xl:w-fit max-w-full bg-[var(--bg-soft)] p-8 md:p-12 rounded-3xl shadow-sm border border-[var(--accent-soft)]">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter leading-[1.1] mb-6 flex flex-col text-[var(--text-main)]">
-              <span className="md:whitespace-nowrap">Razumite sebe.</span>
+              <span className="md:whitespace-nowrap">Emocionalna pismenost</span>
               <span className="font-medium md:whitespace-nowrap">Transformišite svoj život.</span>
             </h1>
             <p className="text-lg md:text-xl text-[var(--text-main)] max-w-2xl leading-relaxed mb-10 font-medium">

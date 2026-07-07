@@ -50,12 +50,9 @@ export default function Navbar() {
               alt="Emocionalna Pismenost Logo" 
               width={32} 
               height={32} 
-              className="w-8 h-8 md:w-10 md:h-10"
+              className="w-12 h-12 md:w-10 md:h-10"
               priority
             />
-            <span>
-              Emocionalna Pismenost
-            </span>
           </Link>
         </div>
 
