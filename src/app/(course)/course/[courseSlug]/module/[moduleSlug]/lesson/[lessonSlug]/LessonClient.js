@@ -47,7 +47,11 @@ export default function LessonClient({
         const Icon = l.content_type === "quiz" ? FaPen : (l.content_type === "exercise" ? FaPuzzlePiece : FaPlay);
 
         return (
-          <li key={l.id} className={`group transition-colors ${isActive ? 'bg-[var(--accent-soft)]' : 'hover:bg-[var(--bg-soft)]'}`}>
+          <li key={l.id} className={`group transition-colors relative ${isActive ? 'bg-[var(--bg-soft)]' : 'hover:bg-[var(--bg-soft)]'}`}>
+            
+            {/* Indikator aktivne lekcije */}
+            {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary)] rounded-r-md"></div>}
+
             <Link 
               href={`/course/${courseSlug}/module/${moduleSlug}/lesson/${l.slug}`}
               onClick={(e) => handleLessonSelect(e, l)}
@@ -81,35 +85,35 @@ export default function LessonClient({
     <div className="min-h-screen bg-[var(--bg-soft)] text-[var(--text-main)] font-medium">
       <div className="mx-auto max-w-[1600px] px-3 md:px-8 py-4 md:py-8">
         
-        {/* Breadcrumb - Truncated na mobilnom, manji margin */}
+        {/* Breadcrumb */}
         <div className="mb-4 md:mb-8">
           <Link 
             href={`/course/${courseSlug}/module/${moduleSlug}`}
             className="text-[var(--primary)] hover:text-[var(--primary-hover)] text-xs md:text-base font-bold flex items-center gap-2 transition-colors uppercase tracking-widest w-full"
           >
             <FaArrowLeft className="shrink-0" /> 
-            <span className="truncate">Nazad: {moduleTitle}</span>
+            <span className="truncate">Nazad na modul: {moduleTitle}</span>
           </Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 md:gap-8 items-start">
           
-          {/* SIDEBAR - DESKTOP ONLY */}
-          <div className="hidden lg:block lg:w-96 shrink-0 sticky top-24">
-            <div className="rounded-3xl border border-[var(--accent-soft)] bg-white overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-[var(--accent-soft)] bg-[var(--bg-soft)]/50">
+          {/* SIDEBAR - Fiksiran sticky i custom scrollbar */}
+          <div className="hidden lg:block lg:w-96 shrink-0 sticky top-8 max-h-[calc(100vh-4rem)] flex flex-col">
+            <div className="rounded-3xl border border-[var(--accent-soft)] bg-white overflow-hidden shadow-sm flex flex-col h-full max-h-[calc(100vh-4rem)]">
+              <div className="p-6 border-b border-[var(--accent-soft)] bg-[var(--bg-soft)]/50 shrink-0">
                 <h3 className="text-xl font-extrabold tracking-tight">Sadržaj modula</h3>
               </div>
-              <div className="max-h-[70vh] overflow-y-auto no-scrollbar">
+              <div className="overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--accent-soft)] [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300">
                 <LessonListContent />
               </div>
             </div>
           </div>
 
-          {/* GLAVNI SADRŽAJ - Manji vertikalni razmaci na mobilnom (space-y-3) */}
-          <div className="flex-1 space-y-3 md:space-y-8 w-full min-w-0">
+          {/* GLAVNI SADRŽAJ */}
+          <div className="flex-1 flex flex-col gap-3 md:gap-6 w-full min-w-0">
 
-            {/* DUGME ZA POP-UP - Kompaktnije na mobilnom */}
+            {/* DUGME ZA POP-UP (Mobilni) */}
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
               className="lg:hidden w-full bg-white border border-[var(--accent-soft)] rounded-xl p-3 flex items-center justify-between font-extrabold shadow-sm active:scale-[0.98] transition-transform"
@@ -139,14 +143,14 @@ export default function LessonClient({
                       <FaTimes />
                     </button>
                   </div>
-                  <div className="overflow-y-auto no-scrollbar pb-8">
+                  <div className="overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--accent-soft)] [&::-webkit-scrollbar-thumb]:rounded-full pb-8">
                     <LessonListContent />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* NAVIGACIJA (Prethodna/Sledeća + Progres) - Smanjen padding i fontovi na mobilnom */}
+            {/* NAVIGACIJA */}
             <div className="relative overflow-hidden bg-white rounded-2xl md:rounded-3xl border border-[var(--accent-soft)] shadow-sm">
               <div className="absolute bottom-0 left-0 w-full h-1.5 bg-[var(--bg-soft)]">
                 <div className="h-full bg-[var(--success)] transition-all duration-700 ease-out" style={{ width: `${progressPercentage}%` }} />
@@ -178,7 +182,7 @@ export default function LessonClient({
                   )}
                 </div>
 
-                {/* Mobilna dugmad - Kompaktnija */}
+                {/* Mobilna dugmad */}
                 <div className="flex md:hidden w-full gap-2 mt-1">
                   <button onClick={() => prevLesson && router.push(`/course/${courseSlug}/module/${moduleSlug}/lesson/${prevLesson.slug}`)} disabled={!prevLesson} className="flex-1 px-3 py-2.5 rounded-xl bg-[var(--bg-soft)] font-bold text-xs disabled:opacity-30 flex justify-center items-center gap-1.5 border border-[var(--accent-soft)]">
                     <FaArrowLeft size={10} /> Preth
@@ -190,7 +194,7 @@ export default function LessonClient({
               </div>
             </div>
 
-            {/* VIDEO PLAYER ILI ZAKLJUČAN EKRAN - Tanji okviri na telefonu */}
+            {/* VIDEO PLAYER ILI ZAKLJUČAN EKRAN */}
             <div className="relative group p-1.5 md:p-3 rounded-2xl md:rounded-[2.5rem] bg-[var(--accent-soft)]">
               <div className="aspect-video w-full overflow-hidden rounded-[1rem] md:rounded-[2rem] bg-black relative z-10">
                 {hasAccess ? (
@@ -232,7 +236,7 @@ export default function LessonClient({
               </div>
             </div>
 
-            {/* KONTROLE (Završi lekciju) & OPIS */}
+            {/* KONTROLE & OPIS */}
             <div className="bg-white p-5 md:p-10 rounded-2xl md:rounded-3xl border border-[var(--accent-soft)] shadow-sm">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-6 md:mb-8 pb-6 md:pb-8 border-b border-[var(--accent-soft)]">
                 <div>
