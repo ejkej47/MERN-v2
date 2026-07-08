@@ -39,7 +39,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-[var(--bg-soft)] border-b border-[var(--accent-soft)]">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative z-20">
         
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 flex items-center">
           <Link 
             href="/" 
             onClick={() => setIsMenuOpen(false)} 
@@ -48,9 +48,9 @@ export default function Navbar() {
             <Image 
               src="/icon.svg" 
               alt="Emocionalna Pismenost Logo" 
-              width={32} 
-              height={32} 
-              className="w-12 h-12 md:w-10 md:h-10"
+              width={64} 
+              height={64} 
+              className="w-16 h-16 md:w-[64px] md:h-[64px] object-contain"
               priority
             />
           </Link>
